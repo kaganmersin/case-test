@@ -1,0 +1,30 @@
+version: 2.1
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.7
+          docker_layer_caching: true
+      - run:
+          name: Build Docker image
+          command: |
+            IMAGE_NAME="my-app-image"
+            TAG=$CIRCLE_SHA1
+            docker build -t $IMAGE_NAME:$TAG .
+      - run:
+          name: Echo Commit Info and Image Details
+          command: |
+            IMAGE_NAME="my-app-image"
+            TAG=$CIRCLE_SHA1
+            echo "Commit $CIRCLE_SHA1 is applied to prod with image $IMAGE_NAME:$TAG"
+
+workflows:
+  version: 2
+  build-and-test:
+    jobs:
+      - build
+
